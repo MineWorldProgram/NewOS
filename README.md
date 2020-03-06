@@ -1,6 +1,8 @@
 # NewOS
 Sistema Operacional para Computercraft ou cc tweaked
 
+![NewOS](http://newcraft.6te.net/ncsystem/newos.png)
+
 ## Version b1.0
 
 #### Novidade
