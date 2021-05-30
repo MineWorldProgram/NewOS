@@ -11,6 +11,7 @@ filesToIgnore = {'README.md', '.gitignore', 'LICENSE', 'version'}
 installerTitle = 'NewOS installer'
 installerColors = {
     titleBarColor = colors.lime,
+    titleBarTextColor = colors.white,
     backgroundColor = colors.gray
 }
 installerSize = {
@@ -26,7 +27,9 @@ githubRepository = 'NewOS'
 
 function drawnTitleBar(data) 
     paintutils.drawBox(data.x, data.y, data.w, data.y, installerColors.titleBarColor)
-    
+    term.setCursorPos(data.x, data.y)
+    term.setTextColor(installerColors.titleBarTextColor)
+    term.write(installerTitle)
 end
 
 function drawnMenu() 
