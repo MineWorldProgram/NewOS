@@ -12,7 +12,7 @@ Sistema Operacional para Computercraft ou cc tweaked
 ## Install
 
 ```lua
-pastebin run WkwCn0CZ
+pastebin run gjpCtcyu
 ```
 
 ## Trailer
@@ -20,4 +20,4 @@ pastebin run WkwCn0CZ
 [![NewOS](http://img.youtube.com/vi/PcEJUGB_F-g/0.jpg)](http://www.youtube.com/watch?v=PcEJUGB_F-g "NewOS")
 
 ## License
-[MIT](https://github.com/NewCraft/NewOS/blob/master/LICENSE)
+[MIT](https://github.com/MineWorldProgram/NewOS/blob/master/LICENSE)
