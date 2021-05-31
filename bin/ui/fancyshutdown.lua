@@ -18,4 +18,9 @@ if args[1] == "shutdown" then
     os.shutdown()
 elseif args[1] == "reboot" then
     os.reboot()
+elseif args[1] == "return" then
+    term.redirect(term.native())
+    term.setCursorPos(1, 3)
+    term.setTextColor(colors.white)
+    term.clear()
 end

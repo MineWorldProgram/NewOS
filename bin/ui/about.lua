@@ -1,5 +1,8 @@
+local util = require('/lib/util')
+local file = util.loadModule("file")
+
 local nameOS = "NewOS"
-local versionOS = "b 1.0"
+local versionOS = "v"..file.read("/version")
 local baseOS = "zwm"
 local versionLua = "v5.1"
 
@@ -12,11 +15,11 @@ local function draw()
     term.write(nameOS)
     term.setCursorPos(w/2-5,3)
     term.setTextColor(colors.white)
-    term.write("Versão:"..versionOS)
+    term.write("Versão: "..versionOS)
     term.setCursorPos(w/2-3,4)
-    term.write("Base:"..baseOS)
+    term.write("Base: "..baseOS)
     term.setCursorPos(w/2-2,5)
-    term.write("Lua:"..versionLua)
+    term.write("Lua: "..versionLua)
 
     local foregroundColor = colors.lightGray
 

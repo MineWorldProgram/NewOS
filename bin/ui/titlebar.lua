@@ -61,11 +61,12 @@ local ok, err = pcall(function()
               wm.endProcess(menuPID)
               menuPID = nil
             else
+              local w, h = wm.getSize()
               menuPID = wm.createProcess("/bin/ui/menu.lua", {
                 x = 1,
-                y = 2,
-                width = 10,
-                height = 8,
+                y = 1,
+                width = 12,
+                height = 2,
                 showTitlebar = false,
                 dontShowInTitlebar = true
               })
@@ -97,11 +98,12 @@ local ok, err = pcall(function()
               wm.endProcess(menuPID)
               menuPID = nil
             else
+              local w, h = wm.getSize()
               menuPID = wm.createProcess("/bin/ui/menu2.lua", {
                 x = 1,
-                y = 2,
+                y = h - 1,
                 width = 6,
-                height = 3,
+                height = 5,
                 showTitlebar = false,
                 dontShowInTitlebar = true
               })

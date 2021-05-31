@@ -27,7 +27,7 @@ local function newRead(win, contents, rchar)
             outstr = outstr .. e[2]
         elseif e[1] == "key" then
             local key = e[2]
-            if key == keys.enter then
+            if key == keys.enter or key == keys.numPadEnter then
                 win.setCursorBlink(false)
                 return outstr
             elseif key == keys.backspace then

@@ -14,7 +14,7 @@ local color2 = colors.lime
 
 local function falseRoot()
     term.setTextColor(color)
-    print("entre no modo: root")
+    print("Entre no Modo: root digitando 'sudo -i'")
     t = true
 end
 
@@ -32,34 +32,43 @@ while true do
     for i, v in pairs(ps) do
       term.write(v.name)	
     end
-    term.setTextColor(color2)
-    term.write("@")
     term.setTextColor(color)
+    term.write("@")
     term.write(os.getComputerLabel() or os.getComputerID())
     term.setTextColor(color2)
-    term.write("#")
+    term.write(":")
     term.setTextColor(color)
-    term.write(dir.." ")
+    term.write(dir)
     term.setTextColor(colors.white)
+    term.write("$".." ")
     
     local input = read(nil, history)
-    if input == "exit" then
-	os.unloadAPI("/lib/nc.lua")
-	wm.endProcess(id)
-	break
+    if input == "exit" and root == true then
+        root = false
+        term.setTextColor(color)
+	    print("sudo: false")
+	    print("type exit again to close the terminal")
+	    color = colors.green
+	    color2 = colors.lime
+
+	    t = true
+    elseif input == "exit" then
+	    os.unloadAPI("/lib/nc.lua")
+	    wm.endProcess(id)
+	    break
     elseif input == "nc" then
-	nc.start()
-	t = true
+	    nc.start()
+	    t = true
     end
     if root == false then
-	if input == "root" then
+	if input == "sudo -i" then
 	    term.setTextColor(color)
-	    print("root: true")
+	    print("sudo: true")
 	    color = colors.white
-	    color2 = colors.gray
-            root = true
+	    color2 = colors.white
+        root = true
 	    t = true
-	end   
+	end
 	for i, v in pairs(flArq) do
 	    local cdPath = "cd "..v
 	    local delPath = "delete "..v
@@ -80,8 +89,8 @@ while true do
         table.insert(history, input)
     end
     if t == false then
-	shell.run(input)
+	    shell.run(input)
     else
-	t = false
+	    t = false
     end
 end
