@@ -110,6 +110,7 @@ local function main()
   end
 
   local function drawProcess(proc)
+    if (proc == nil) then return end
     if proc.showTitlebar == false then
       term.redirect(proc.window)
       if proc.maximazed then
@@ -710,6 +711,7 @@ local function main()
     end
 
     -- Update windows
+    if (not selectedProcess) then return end
     term.redirect(selectedProcess.window)
     removeDeadProcesses()
 

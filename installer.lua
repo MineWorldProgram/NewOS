@@ -3,17 +3,17 @@
 -- [ About: Downloads the main version of a GitHub Repository ] --
 
 -- [ Global variables (Do not touch!) ] --
-ScreenSizeX, ScreenSizeY = term.getSize()
-backgroundColorBackup = term.getBackgroundColor()
-textColorBackup = term.getTextColor()
 cursorPosXBackup, cursorPosYBackup = term.getCursorPos()
+backgroundColorBackup = term.getBackgroundColor()
+ScreenSizeX, ScreenSizeY = term.getSize()
+textColorBackup = term.getTextColor()
 runningInstaller = true
+os.loadAPI("json.lua")
 canBeClosed = true
 animate = false
 line1 = ''
 line2 = ''
 line3 = ''
-os.loadAPI("json.lua")
 
 -- [ Installer configs ] --
 showLicensePage = false
@@ -23,8 +23,14 @@ installerCloseButton = string.char(7)
 installerColors = {
     titleBar = colors.lime,
     titleBarText = colors.white,
+    mainTextColor = colors.white,
     background = colors.gray,
-    closeButton = colors.red
+    closeButton = colors.red,
+    greenText = colors.green,
+    yellowText = colors.yellow,
+    redText = colors.red,
+    lightGreenText = colors.lime,
+    grayText = colors.lightGray
 }
 installerSize = {
     x = (ScreenSizeX / 8) + 1,
@@ -69,11 +75,15 @@ end
 
 function generateButton(window, x,y,width,h,color1,color2, text)
     if (not runningInstaller) then return end
-    drawnFilledBox(window, x, y, width, h, color1)
-    term.setCursorPos(x + ( string.len(text) / 2 ) + 2, y + (h / 2) + 2)
-    term.setBackgroundColor(color1)
-    term.setTextColor(color2)
-    term.write(text)
+    x = math.floor(x)
+    y = math.floor(y)
+    width = math.floor(width)
+    h = math.floor(h)
+    drawnFilledBox(window, x, y, width - 1, h - 1, color1)
+    window.setCursorPos((x) + (math.floor((width) / 2) - math.floor( string.len(text) / 2 )), y + (h / 2))
+    window.setBackgroundColor(color1)
+    window.setTextColor(color2)
+    window.write(text)
     local clicked = false
     while not clicked do
         if (not runningInstaller) then
@@ -81,8 +91,8 @@ function generateButton(window, x,y,width,h,color1,color2, text)
             break
         end
         local event, button, mx, my = os.pullEvent('mouse_click')
-        if (mx > ((installerSize.x + x) - 3) and mx < ((installerSize.x + x + width) - 1)) then
-            if (my > ((installerSize.y + y) - 2) and my < ((installerSize.y + y + h) - 1)) then
+        if (mx > (x + math.floor(installerSize.x) - 2) and mx < (math.floor(installerSize.x) + x + width) - 1) then
+            if (my > (y + math.floor(installerSize.y) - 2) and my < (math.floor(installerSize.y) + y + h) - 1) then
                 clicked = true
             end
         end
@@ -107,6 +117,17 @@ function drawnMenu(window)
     drawnFilledBox(window, 1, 2, WindowSizeX, WindowSizeY, installerColors.background)
 end
 
+function closeInstaller()
+    if (canBeClosed) then
+        installerWindow.setBackgroundColor(backgroundColorBackup)
+        installerWindow.setTextColor(textColorBackup)
+        installerWindow.clear()
+        installerWindow.setVisible(false)
+        term.setCursorPos(cursorPosXBackup, cursorPosYBackup)
+        runningInstaller = false
+    end
+end
+
 function inputHandler()
     while runningInstaller do
         local event, button, x, y = os.pullEventRaw()
@@ -116,14 +137,7 @@ function inputHandler()
                 -- Left click of mouse Events
                 if (x == math.floor(installerSize.width + installerSize.x - 1) and y == math.floor(installerSize.y)) then
                     -- Close event
-                    if (canBeClosed) then
-                        installerWindow.setBackgroundColor(backgroundColorBackup)
-                        installerWindow.setTextColor(textColorBackup)
-                        installerWindow.clear()
-                        installerWindow.setVisible(false)
-                        term.setCursorPos(cursorPosXBackup, cursorPosYBackup)
-                        runningInstaller = false
-                    end
+                    closeInstaller()
                 end
             end
         end
@@ -151,68 +165,159 @@ function loadingAnimation(w,y)
         line1 = '\\. '
         line2 = '~\\.'
         line3 = '~~\\'
+        if (not animate) then return end
         drawner()
         sleep(0.1)
         line1 = '-.'
         line2 = '~\\'
         line3 = '~~\\'
+        if (not animate) then return end
         drawner()
         sleep(0.1)
         line1 = '.-.'
         line2 = '/~\\'
         line3 = '~~~'
+        if (not animate) then return end
         drawner()
         sleep(0.1)
         line1 = ' ./'
         line2 = './~'
         line3 = '/~~'
+        if (not animate) then return end
         drawner()
         sleep(0.1)
         line1 = ' ./'
         line2 = '\\- '
         line3 = '~~~'
+        if (not animate) then return end
         drawner()
         sleep(0.1)
         line1 = '\\. '
         line2 = '~--'
         line3 = '~~~'
+        if (not animate) then return end
         drawner()
         sleep(0.1)
     end
 end
 
+function pageError(errorCode, description)
+    drawnMenu(installerWindow)
+    
+    canBeClosed = true
+
+    local linePosY = 2
+    
+    linePosY = centerText('Oh No!', installerSize.width, linePosY)
+    linePosY = centerText('', installerSize.width, linePosY)
+    linePosY = centerText('Ocorreu um erro durante a instalação', installerSize.width, linePosY)
+    linePosY = centerText(' do NewOs.', installerSize.width, linePosY)
+    linePosY = centerText('', installerSize.width, linePosY)
+    linePosY = centerText('Código de Erro: ' .. errorCode, installerSize.width, linePosY)
+
+    if not (description == nil) then
+        linePosY = centerText('Descrição do Erro: '..description, installerSize.width, linePosY)
+    end
+
+    generateButton(installerWindow, installerSize.width - 4, installerSize.height - 1, 4, 1, installerColors.closeButton, installerColors.mainTextColor, 'Sair')
+    closeInstaller()
+end
+
 -- InstallProcess
 function page4()
-    drawnMenu(installerWindow);
+    runningInstaller = true
+    canBeClosed = false
+    installerColors.closeButton = colors.lightGray
+    drawnMenu(installerWindow)
+    
 end
 
 -- LicensePage
 function page3()
-    drawnMenu(installerWindow);
+    drawnMenu(installerWindow)
     print('Comming Soon™️!')
 end
 
 -- Install Info
-function page2(canInstall, freeSize, osSize, finalSize)
-    drawnMenu(installerWindow);
+function page2(canInstall, freeSize, osSize, finalSize, license)
+    drawnMenu(installerWindow)
 
-    linePosY = 2
+    local linePosY = 2
     if (canInstall) then
-        installerWindow.setTextColor(colors.lime)
+        installerWindow.setTextColor(installerColors.lightGreenText)
         linePosY = centerText('Incrivel!', installerSize.width, linePosY)
-    else 
-        term.setTextColor(colors.red)
-        linePosY = centerText('Oh No!', installerSize.width, linePosY)
-    end
 
+        linePosY = linePosY + 2
+        
+        installerWindow.setCursorPos(2, linePosY)
+        installerWindow.setTextColor(installerColors.mainTextColor)
+        installerWindow.write('Espaço disponivel: ')
+        if (math.floor(freeSize) > 1024) then
+            installerWindow.setTextColor(installerColors.greenText)
+        elseif (math.floor(freeSize) > 512) then
+            installerWindow.setTextColor(installerColors.yellowText)
+        else
+            installerWindow.setTextColor(installerColors.redText)
+        end
+        installerWindow.write(math.floor(freeSize))
+        installerWindow.setTextColor(installerColors.mainTextColor)
+        installerWindow.write(' KB(s)')
+        
+        linePosY = linePosY + 1
+        installerWindow.setCursorPos(2, linePosY)
+        installerWindow.setTextColor(installerColors.mainTextColor)
+        installerWindow.write('Tamanho do sistema: ')
+        installerWindow.setTextColor(installerColors.lightGreenText)
+        installerWindow.write(osSize)
+        installerWindow.setTextColor(installerColors.mainTextColor)
+        installerWindow.write(' KB(s)')
+
+        linePosY = linePosY + 1
+        installerWindow.setCursorPos(2, linePosY)
+        installerWindow.setTextColor(installerColors.mainTextColor)
+        installerWindow.write('Espaço restante: ')
+        if (math.floor(finalSize) > 1024) then
+            installerWindow.setTextColor(installerColors.greenText)
+        elseif (math.floor(finalSize) > 512) then
+            installerWindow.setTextColor(installerColors.yellowText)
+        else
+            installerWindow.setTextColor(installerColors.redText)
+        end
+        installerWindow.write(math.floor(finalSize))
+        installerWindow.setTextColor(installerColors.mainTextColor)
+        installerWindow.write(' KB(s)')
+
+        if (showLicensePage == false) then
+            linePosY = linePosY + 2
+            installerWindow.setCursorPos(2, linePosY)
+            installerWindow.write('Licença: '..license)
+        end
+
+    else 
+        installerWindow.setTextColor(installerColors.closeButton)
+        linePosY = centerText('Oh No!', installerSize.width, linePosY)
+        linePosY = centerText('Espaço insuficiente!', installerSize.width, linePosY)
+        linePosY = centerText('Libere '.. osSize ..' kb de espaço!', installerSize.width, linePosY)
+
+        generateButton(installerWindow, installerSize.width - 4, installerSize.height - 1, 4, 1, installerColors.closeButton, installerColors.mainTextColor, 'Sair')
+        closeInstaller()
+    end
+    
     
     if (canInstall) then
-        generateButton(installerWindow, installerSize.width -9, installerSize.height - 1, 8, 0, colors.lime, colors.white, 'Continuar')
+        local function nextButton()
+            generateButton(installerWindow, installerSize.width - 8, installerSize.height - 1, 8, 1, installerColors.greenText, installerColors.mainTextColor, 'Instalar')
+        end
+        local function cancelButton()
+            generateButton(installerWindow, 2, installerSize.height - 1, 8, 1, installerColors.grayText, installerColors.mainTextColor, 'Cancelar')
+            closeInstaller()
+        end
+        parallel.waitForAny(nextButton, cancelButton)
     end
 
     if (runningInstaller) then
         if (showLicensePage == true) then
-            page3()
+            page3(license)
         else
             page4()
         end
@@ -220,12 +325,12 @@ function page2(canInstall, freeSize, osSize, finalSize)
 end
 
 function page1()
-    drawnMenu(installerWindow);
+    drawnMenu(installerWindow)
     
-    installerWindow.setBackgroundColor(colors.gray)
-    installerWindow.setTextColor(colors.white)
+    installerWindow.setBackgroundColor(installerColors.background)
+    installerWindow.setTextColor(installerColors.mainTextColor)
 
-    linePosY = 2
+    local linePosY = 2
     linePosY = centerText('Olá!', installerSize.width, linePosY)
     linePosY = centerText('', installerSize.width, linePosY)
     linePosY = centerText('Seja muito bem vindo(a) ao', installerSize.width, linePosY)
@@ -236,32 +341,49 @@ function page1()
     linePosY = centerText('suficiente em disco para a instalação', installerSize.width, linePosY)
 
     local canInstall = false
+    local license = nil
     local finalSize = 0
     local freeSize = 0
     local osSize = 0
+    local githubjson = nil
     
     local function animator()
         animate = true
         loadingAnimation(installerSize.width, linePosY + 2)
-        generateButton(installerWindow, (installerSize.width / 2) - 5, linePosY + 2, 10, 2, colors.lime, colors.white, 'Continuar')
+        if (githubjson) then
+            generateButton(installerWindow, (installerSize.width / 2) - 5, linePosY + 2, 11, 3, installerColors.greenText, installerColors.mainTextColor, 'Continuar')
+        end
     end
     
     local function getData()
-        githubjson = http.get(githubApiUrl)
-        
+        githubjson, httpErrorMessage, pageErrorContent = http.get(githubApiUrl)
         if (githubjson == nil) then
-            return print('Failed')
+            animate = false
+            if (not pageErrorContent == nil) then
+                local errorJson = pageErrorContent.readAll()
+                local parsedError = json.decode(errorJson)
+                local keyWord = string.sub(parsedError.message, 4, 10)
+                if (keyWord == 'rate limit') then
+                    pageError('0x10c', 'GitHubRateLimit')
+                else
+                    pageError('0x01a', 'GitHubUnknow')
+                end
+            end
+            pageError('0x01a', 'GitHubUnknow')
+            return
         end
         
         parsedResult = json.decode(githubjson.readAll())
 
-        freeSize = fs.getFreeSpace("/") * 1024
+        freeSize = fs.getFreeSpace("/") / 1024
 
         osSize = parsedResult.size
 
         finalSize = freeSize - osSize
 
-        if (finalSize > 1024) then
+        license = parsedResult.license.name
+
+        if (finalSize > 0) then
             canInstall = true
         end
 
@@ -269,8 +391,8 @@ function page1()
     end
     parallel.waitForAll(animator, getData)
     if (runningInstaller) then
-        page2(canInstall, freeSize, osSize, finalSize)
+        page2(canInstall, freeSize, osSize, finalSize, license)
     end
 end
 
-parallel.waitForAll(inputHandler, page1)
+parallel.waitForAll(inputHandler, page4)
