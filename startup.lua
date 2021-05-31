@@ -30,18 +30,24 @@ if fs.exists("/boot/arquivos.cfg") then
             term.blit("[ OK ]", "005500", "ffffff")
             term.write(" " .. v)
         else
-            term.blit("[FAIL]", "0eeee0", "ffffff")
-            term.write(" " .. v)
-            table.insert(ArquivosA, v)
+            if (fs.exists("/etc/accounts-default.cfg") and v == "/etc/accounts.cfg") then
+                os.rename("etc/accounts-default.cfg", "etc/accounts.cfg")
+                term.blit("[ OK ]", "005500", "ffffff")
+                term.write(" " .. v)
+            else
+                term.blit("[FAIL]", "0eeee0", "ffffff")
+                term.write(" " .. v)
+                table.insert(ArquivosA, v)
+            end
         end
         print()
-	sleep(0.01)
+        sleep(0.01)
     end
 else
     term.blit("[FAIL]", "0eeee0", "ffffff")
-    term.write(" /boot/files.cfg")
+    term.write(" /boot/arquivos.cfg")
     print()
-    printError("Arquivo /boot/files.cfg não Encontrado!\nAlguns arquivos não forão encontrados! Reporte para os mantenedores em: https://github.com/MineWorldProgram/NewOS/issues")
+    printError("Arquivo /boot/arquivos.cfg não Encontrado!\nAlguns arquivos não forão encontrados! Reporte para os mantenedores em: https://github.com/MineWorldProgram/NewOS/issues")
     return false
 end
 
