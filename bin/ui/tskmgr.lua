@@ -56,10 +56,7 @@ while true do
   elseif e[1] == "key" then
     local key = e[2]
     if key == keys.delete then
-      if selectedID == 3 then
-      else
-        wm.endProcess(selectedID)
-      end
+      wm.endProcess(selectedID)
     end
   end
 end

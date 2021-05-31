@@ -62,13 +62,14 @@ while true do
         if x >= 2 and x <= w - 2 and y == 4 then
             content = box.select()
         elseif x >= 2 and x <= 6 and y == 6 then
+            local myId = id
             wm.selectProcess(wm.createProcess(content, {
                 x = 2,
                 y = 3,
-                width = 30,
-                height = 20
+                width = 5,
+                height = 5
             }))
-            wm.endProcess(id)
+            wm.endProcess(myId)
             break
         end
     end

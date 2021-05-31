@@ -9,25 +9,34 @@ local flArq = fl.readTable("/etc/arqPasta.cfg")
 os.loadAPI("/lib/nc.lua")
 local t = false
 local root = false
+local first = true
 local color = colors.green
 local color2 = colors.lime
 
+local sudoComand = "sudo -i"
+
 local function falseRoot()
     term.setTextColor(color)
-    print("Entre no Modo: root digitando 'sudo -i'")
+    print("Entre no Modo root digitando '"..sudoComand.."'")
     t = true
 end
 
 
 while true do
     local dir = shell.dir()
-    if dir == "" then
-	for i, v in pairs(ps) do
-          dir = v.homeDir	
+
+    if (dir == "" and root == false and first == false) then
+        print("You need to be in root mode to acess this directory")
+        print("To enable root mode type '"..sudoComand.."'")
+        shell.run('cd '..dir)
+    elseif first == true then
+        for i, v in pairs(ps) do
+            dir = v.homeDir	
         end
-	local dire = "cd "..dir
-	shell.run(dire)
+        shell.run('cd '..dir)
+        first = false
     end
+
     term.setTextColor(color)
     for i, v in pairs(ps) do
       term.write(v.name)	
@@ -61,7 +70,7 @@ while true do
 	    t = true
     end
     if root == false then
-	if input == "sudo -i" then
+	if input == sudoComand then
 	    term.setTextColor(color)
 	    print("sudo: true")
 	    color = colors.white
@@ -75,13 +84,23 @@ while true do
 	    local editPath = "edit "..v
 	    local rmPath = "rm "..v
             if input == cdPath then
-	       falseRoot()
+	            falseRoot()
+                break
             elseif input == delPath then
-	       falseRoot()
+	            falseRoot()
+                break
             elseif input == editPath then
-	       falseRoot()
+	            falseRoot()
+                break
             elseif input == rmPath then
-	       falseRoot()
+	            falseRoot()
+                break
+            elseif input == 'reboot' then
+                falseRoot()
+                break
+            elseif input == 'shutdown' then
+                falseRoot()
+                break
             end
     	end
     end

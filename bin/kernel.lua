@@ -24,7 +24,7 @@ term.clear()
 term.setCursorPos(1, 1)
 
 print("Bem Vindo ao NewOS!")
-sleep(0.5)
+sleep(0)
 print()
 print("Caregando Lista de Pacotes...")
 local packageDirs = loadtable("/boot/package.path")
@@ -33,33 +33,48 @@ for i, v in pairs(packageDirs) do
 end
 _G.package = package
 print(package.path)
-sleep(1)
+sleep(0.25)
 
 -- animation
 
 term.setBackgroundColor(colors.black)
 term.clear()
+
+local opus = {
+  '555ddd5ddddddddddddddddddd55555ddd555555',
+  '5dd5dd5dddddddddddddddddd5ddddd5d5dddddd',
+  '5dd5dd5d55555555d5ddddd5d5ddddd5d5dddddd',
+  '5dd5dd5d5dddddd5d5ddddd5d5ddddd5dd55555d',
+  '5dd5dd5d5dddddd5d5ddddd5d5ddddd5ddddddd5',
+  '5dd5dd5d5d55555dd5dd5dd5d5ddddd5ddddddd5',
+  '5dd5dd5d5dddddddd5d5d5d5d5ddddd5ddddddd5',
+  '5ddd555d55555555dd5ddd5ddd55555dd555555d',
+}
 term.setBackgroundColor(colors.green)
+--opusHeight = tablelength(opus)
+opusHeight = #opus
+opusTopMargin = math.floor(( ( h / 2 ) - ( opusHeight / 2 ) ))
 for i = 1, h do
     term.setCursorPos(1, i)
     term.clearLine()
-    sleep(0.05)
+    if (i >= opusTopMargin and i <= (opusTopMargin + opusHeight) - 1) then
+      local lineSize = opus[ math.floor(( (i - opusTopMargin) + 1 )) ]:len()
+      for v=1, (lineSize) do
+        local letter = string.sub(opus[ math.floor( ( ( i - opusTopMargin ) + 1 ) ) ], v, v)
+        term.setCursorPos(( ( w / 2 ) - (lineSize / 2)) + v, i)
+        if (letter == '5') then
+          term.setBackgroundColor(colors.lime)
+          term.write(' ')
+        else 
+          term.setBackgroundColor(colors.green)
+          term.write(' ')
+        end
+        term.setBackgroundColor(colors.green)
+      end
+    end
+    sleep(0.01)
 end
-local opus = {
-			'555ddd5ddddddddddddddddddd55555ddd555555',
-			'5dd5dd5dddddddddddddddddd5ddddd5d5dddddd',
-			'5dd5dd5d55555555d5ddddd5d5ddddd5d5dddddd',
-			'5dd5dd5d5dddddd5d5ddddd5d5ddddd5dd55555d',
-			'5dd5dd5d5dddddd5d5ddddd5d5ddddd5ddddddd5',
-			'5dd5dd5d5d55555dd5dd5dd5d5ddddd5ddddddd5',
-			'5dd5dd5d5dddddddd5d5d5d5d5ddddd5ddddddd5',
-			'5ddd555d55555555dd5ddd5ddd55555dd555555d',
-		}
-for k,line in ipairs(opus) do
-   term.setCursorPos((w - 38) / 2, k + (h - #opus) / 2)
-   term.blit(string.rep(' ', #line), string.rep('a', #line), line)
-end
-sleep(1)
+sleep(0.3)
 
 --
 
@@ -226,6 +241,10 @@ local function main()
     end
   end
 
+  function wm.selectProcessName(name)
+
+  end
+
   function wm.selectProcessAfter(pid, time)
     sleep(time)
     wm.selectProcess(pid)
@@ -331,6 +350,17 @@ local function main()
   end
 
   function wm.createProcess(path, settings)
+    local alreadyExists = false
+    if (settings.once == true) then
+      for i,v in ipairs(processes) do
+        if (v.title == settings.title) then
+          alreadyExists = true
+        end
+      end
+    end
+    if (alreadyExists == true) then
+      return
+    end
     lastProcID  = lastProcID + 1
     if not settings.title and type(path) == "string" then
       settings.title = fs.getName(path)
@@ -341,8 +371,16 @@ local function main()
       settings.title = "Untitled"
     end
 
-    if settings.showTitlebar == nil or settings.showTitlebar == true then
+    if settings.showTitlebar == nil then
       settings.showTitlebar = true
+    end
+
+    if settings.resizable == nil then
+      settings.resizable = true
+    end
+
+    if settings.once == nil then
+      settings.once = false
     end
 
     if not settings.width then
@@ -450,11 +488,14 @@ local function main()
     showTitlebar = true,
     dontShowInTitlebar = true,
     disableControls = true,
+    resizable = false,
     title = "Login",
     height = 7,
     y =  (h / 2) - 4
   })
+
   wm.selectProcess(loginID)
+
   wm.createService(function()
     sleep(5)
     os.reboot()
@@ -477,11 +518,13 @@ local function main()
           resizeStartH = nil
           drawProcesses()
         elseif e[1] == "mouse_drag" then
-          if ((resizeStartH + (y - resizeStartY)) > 6) then
-            selectedProcess.height = (resizeStartH + (y - resizeStartY))
-          end
-          if ((resizeStartW + (x - resizeStartX)) > 10) then
-            selectedProcess.width = (resizeStartW + (x - resizeStartX))
+          if (selectedProcess.resizable) then
+            if ((resizeStartH + (y - resizeStartY)) > 6) then
+              selectedProcess.height = (resizeStartH + (y - resizeStartY))
+            end
+            if ((resizeStartW + (x - resizeStartX)) > 10) then
+              selectedProcess.width = (resizeStartW + (x - resizeStartX))
+            end
           end
           term.redirect(selectedProcess.window)
           coroutine.resume(selectedProcess.coroutine, "term_resize")
@@ -618,6 +661,14 @@ local function main()
         }))
         drawProcesses()
       end
+      if isKeyDown(keys.leftCtrl) and isKeyDown(keys.leftShift) and isKeyDown(keys.r) then
+        wm.selectProcess(wm.createProcess("/bin/ui/run.lua", {
+          width = 24,
+          height = 7,
+          title = "Run"
+        }))
+        drawProcesses()
+      end
       term.redirect(selectedProcess.window)
       coroutine.resume(selectedProcess.coroutine, table.unpack(e))
     elseif e[1] == "wm_fancyshutdown" then
@@ -637,9 +688,12 @@ local function main()
         dontShowInTitlebar = true
       })
       wm.selectProcess(titlebarID)
+      os.queueEvent("term_resize")
     elseif e[1] == 'term_resize' then
       local v = processes[titlebarID]
-      v.width, v.y = native.getSize()
+      if (v) then
+        v.width, v.y = native.getSize()
+      end
       for i, v in pairs(processes) do
         term.redirect(v.window)
         coroutine.resume(v.coroutine, table.unpack(e))
@@ -658,12 +712,14 @@ local function main()
     -- Update windows
     term.redirect(selectedProcess.window)
     removeDeadProcesses()
+
     for i, v in pairs(processes) do
       if i ~= selectedProcessID then
         term.redirect(v.window)
         coroutine.resume(v.coroutine, "keepalive")
       end
     end
+    
     if selectedProcess.minimized then
       wm.selectProcess(titlebarID or 1)
     else
@@ -677,10 +733,13 @@ local function split(inputstr, sep)
   if sep == nil then
     sep = "%s"
   end
+  
   local t={}
+  
   for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
     table.insert(t, str)
   end
+
   return t
 end
 

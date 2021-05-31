@@ -68,6 +68,7 @@ function drawnFilledBox(window, x, y, w, h, color)
 end
 
 function generateButton(window, x,y,width,h,color1,color2, text)
+    if (not runningInstaller) then return end
     drawnFilledBox(window, x, y, width, h, color1)
     term.setCursorPos(x + ( string.len(text) / 2 ) + 2, y + (h / 2) + 2)
     term.setBackgroundColor(color1)
@@ -146,7 +147,7 @@ function loadingAnimation(w,y)
         installerWindow.setCursorPos((w / 2) - 2, y + 2)
         installerWindow.write(line3)
     end
-    while animate do
+    while (animate and runningInstaller) do
         line1 = '\\. '
         line2 = '~\\.'
         line3 = '~~\\'

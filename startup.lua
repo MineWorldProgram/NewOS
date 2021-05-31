@@ -2,7 +2,7 @@ term.clear()
 term.setCursorPos(1, 1)
 print("Inicializando Sistema...")
 print()
-sleep(0.5)
+sleep(0)
 
 local function loadt(path)
     local file = fs.open(path, "r")
@@ -22,7 +22,7 @@ local ArquivosA = {}
 print("Verificando Arquivos do Sistema...")
 print("===================================================")
 print("")
-sleep(0.5)
+sleep(0)
 if fs.exists("/boot/arquivos.cfg") then
     local files = loadt("/boot/arquivos.cfg")
     for i, v in pairs(files) do
@@ -41,22 +41,24 @@ if fs.exists("/boot/arquivos.cfg") then
             end
         end
         print()
-        sleep(0.01)
+        sleep(0)
     end
 else
     term.blit("[FAIL]", "0eeee0", "ffffff")
     term.write(" /boot/arquivos.cfg")
     print()
     printError("Arquivo /boot/arquivos.cfg não Encontrado!\nAlguns arquivos não forão encontrados! Reporte para os mantenedores em: https://github.com/MineWorldProgram/NewOS/issues")
+    sleep(2)
     return false
 end
 
 if #ArquivosA > 0 then
     printError(string.format("Arquivos Ausentes: %s\nAlguns arquivos não forão encontrados! Reporte para os mantenedores em: https://github.com/MineWorldProgram/NewOS/issues", table.concat(ArquivosA, ", ")))
+    sleep(2)
     return false
 end
 
-sleep(0.3)
+sleep(0)
 
 local systempath = loadt("/boot/system.path")
 shell.run(

@@ -3,6 +3,7 @@ local ok, err = pcall(function()
   local hiddenNames = {"menu", "titlebar"}
   local running = {}
   local procList
+  local positionHandled = false
 
   local util = require("/lib/util")
   local file = util.loadModule("file")
@@ -15,6 +16,18 @@ local ok, err = pcall(function()
 
   local function draw()
     procList = wm.listProcesses()
+    tw, th = wm.getSize()
+    if (procList[id] ~= nil and positionHandled == false) then
+      procList[id].width = tw
+      procList[id].height = 1
+      procList[id].y = th
+      procList[id].x = 1
+      procList[id].showTitlebar = false
+      procList[id].dontShowInTitlebar = true
+      procList[id].resizable = false
+      os.queueEvent('term_resize')
+      positionHandled = true
+    end
 
     term.setBackgroundColor(theme.menu.background)
     term.clear()

@@ -11,7 +11,7 @@ local applicationsA = {
     path = "/bin/ui/shutdown.lua",
     settings = {
       width = 15,
-      height = 7,
+      height = 8,
       showTitlebar = false,
       dontShowInTitlebar = true,
       title = "Power"
@@ -51,8 +51,8 @@ local applicationsA = {
     title = "Terminal",
     path = "/bin/shell.lua",
     settings = {
-      width = 25,
-      height = 8,
+      width = 30,
+      height = 13,
       title = "Terminal"
   }
   },
