@@ -31,7 +31,7 @@ if fs.exists("/boot/arquivos.cfg") then
             term.write(" " .. v)
         else
             if (fs.exists("/etc/accounts-default.cfg") and v == "/etc/accounts.cfg") then
-                fs.move("/etc/accounts-default.cfg", "/etc/accounts.cfg")
+                fs.copy("/etc/accounts-default.cfg", "/etc/accounts.cfg")
                 term.blit("[ OK ]", "005500", "ffffff")
                 term.write(" " .. v)
             else
