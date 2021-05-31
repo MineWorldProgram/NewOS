@@ -1,4 +1,4 @@
--- JSON api by ElvishJerricco on CC fourms
+-- JSON api by ElvishJerricco on CC forum
 -- Modified to work with require
 
 local public = {}

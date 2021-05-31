@@ -56,9 +56,11 @@ local function draw()
     term.setTextColor(colors.red)
     centerText("@ Desligar", 2, 1)
     term.setTextColor(colors.orange)
-    centerText("#Reiniciar", 3, 1)
+    centerText("# Re-ligar", 3, 1)
+    term.setTextColor(colors.yellow)
+    centerText("& Craft OS", 4, 1)
     term.setTextColor(colors.lightGray)
-    centerText("X Cancelar", 5, 1) 
+    centerText("X Cancelar", 6, 1) 
 end
 
 draw()
@@ -72,7 +74,9 @@ while true do
             os.queueEvent("wm_fancyshutdown", "shutdown")
         elseif y == 3 then
             os.queueEvent("wm_fancyshutdown", "reboot")
-        elseif y == 5 then
+        elseif y == 4 then
+            os.queueEvent("wm_fancyreturn", "return")
+        elseif y == 6 then
             wm.endProcess(id)
         end
     end

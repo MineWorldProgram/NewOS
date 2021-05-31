@@ -8,6 +8,11 @@ local password = textbox.new(2, 4, w - 2, "\7", "Senha")
 
 local logins = file.readTable("/etc/accounts.cfg")
 
+if (logins == nil) then
+    wm.endProcess(id)
+   shell.run('/bin/ui/register.lua')
+end
+
 local usrRaw = ""
 local pswrdRaw = ""
 local errorText = ""
@@ -79,11 +84,18 @@ while true do
                 if sha256(pswrdRaw) == v.passwordHash and v.name == usrRaw then
                     os.queueEvent("wm_login")
                     found = true
+                    if fs.exists('/home/'..v.name) == false then
+                        fs.makeDir("home/"..v.name.."/Documentos")
+                        fs.makeDir("home/"..v.name.."/Musica")
+                        fs.makeDir("home/"..v.name.."/Imagens")
+                        fs.makeDir("home/"..v.name.."/Videos")
+                        fs.makeDir("home/"..v.name.."/Downloads")
+                    end
                     wm.endProcess(id)
                 end
             end
             if not found then
-                errorText = "Incorreto"
+                errorText = "Incorreto!"
             end
         end
     end

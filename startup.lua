@@ -19,7 +19,7 @@ end
 
 local ArquivosA = {}
 
-print("verificando arquivos do sistema...")
+print("Verificando Arquivos do Sistema...")
 print("===================================================")
 print("")
 sleep(0.5)
@@ -41,12 +41,12 @@ else
     term.blit("[FAIL]", "0eeee0", "ffffff")
     term.write(" /boot/files.cfg")
     print()
-    printError("Ausência de /boot/files.cfg\nalgumas arquivos não forão encontrados report para a NC System no site: newcraft.6te.net/ncsystem")
+    printError("Arquivo /boot/files.cfg não Encontrado!\nAlguns arquivos não forão encontrados! Reporte para os mantenedores em: https://github.com/MineWorldProgram/NewOS/issues")
     return false
 end
 
 if #ArquivosA > 0 then
-    printError(string.format("Arquivos ausentes: %s\nalgumas arquivos não forão encontrados report para a NC System no site: newcraft.6te.net/ncsystem", table.concat(ArquivosA, ", ")))
+    printError(string.format("Arquivos Ausentes: %s\nAlguns arquivos não forão encontrados! Reporte para os mantenedores em: https://github.com/MineWorldProgram/NewOS/issues", table.concat(ArquivosA, ", ")))
     return false
 end
 
