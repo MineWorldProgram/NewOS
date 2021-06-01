@@ -1,16 +1,16 @@
 # NewOS
-Sistema Operacional para Computercraft ou cc tweaked
+Um novo e completo Sistema Operacional para [Computercraft](https://www.curseforge.com/minecraft/mc-mods/computercraft) e [CC: Tweaked](https://www.curseforge.com/minecraft/mc-mods/cc-tweaked)
 
 ![NewOS](http://newcraft.6te.net/ncsystem/newos.png)
 
-## Version b1.0
+## Versão atual: 1.0.0-alpha
 
-#### Novidade
-* Task Manager: não deixa fechar o 'titlebar' para não deixar o sistema não funcional 
-* Terminal: add um terminal
+#### Novidades
+Verifique nossa [CHANGELOG](https://github.com/MineWorldProgram/NewOS/blob/master/CHANGELOG.md)
 
-## Install
+## Instalação
 
+Nosso shell de instalação interativo vai lhe ajudar com tudo que precisar, basta digitar o seguinte comando em seu terminar e seguir as instruções!
 ```lua
 pastebin run gjpCtcyu
 ```
