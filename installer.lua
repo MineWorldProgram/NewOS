@@ -234,11 +234,11 @@ end
 
 function pageError(errorCode, description)
     drawnMenu(installerWindow)
-    
+
     canBeClosed = true
 
     local linePosY = 2
-    
+
     installerWindow.setTextColor(installerColors.redText)
     linePosY = centerText('Oh No!', installerSize.width, linePosY)
     linePosY = centerText('', installerSize.width, linePosY)
@@ -270,16 +270,19 @@ function page5()
     linePosY = centerText('', installerSize.width, linePosY)
     linePosY = centerText('Deseja reiniciar agora?', installerSize.width, linePosY)
 
+    shell.run('delete '..installerFile)
+    shell.run('delete '..jsonFile)
+
     local function cancelButton()
         generateButton(installerWindow, 2, installerSize.height - 1, 6, 1, installerColors.closeButton, installerColors.mainTextColor, 'Depois')
         closeInstaller()
     end
-    
+
     local function continueButton()
         generateButton(installerWindow, installerSize.width - 5, installerSize.height - 1, 5, 1, installerColors.greenText, installerColors.mainTextColor, 'Agora')
         os.reboot()
     end
-    
+
     parallel.waitForAny(cancelButton, continueButton)
 end
 
@@ -291,7 +294,7 @@ function page4()
     drawnMenu(installerWindow)
 
     local linePosY = 2
-    
+
     installerWindow.setTextColor(installerColors.mainTextColor)
     linePosY = centerText('Por Favor aguarde!', installerSize.width, linePosY)
     linePosY = centerText('Estamos baixando os arquivos', installerSize.width, linePosY)
@@ -476,7 +479,6 @@ function page4()
             else
                 instalationSucessfull = true
             end
-
             if (instalationSucessfull == true) then
                 installingFileWindow.setCursorPos(1, ifwY)
                 installingFileWindow.scroll(1)
@@ -506,7 +508,7 @@ function page4()
                 progressBarDrawner()
             end
         end
-        
+
         parallel.waitForAny(textAnimation, progressBarDrawner, directoriesCreator)
         if (instalationSucessfull == true) then
             installingFileWindow.setVisible(false)
@@ -654,7 +656,7 @@ function page2(canInstall, freeSize, osSize, finalSize, license)
         linePosY = centerText('Incrivel!', installerSize.width, linePosY)
 
         linePosY = linePosY + 2
-        
+
         installerWindow.setCursorPos(2, linePosY)
         installerWindow.setTextColor(installerColors.mainTextColor)
         installerWindow.write('Espaço disponivel: ')
@@ -668,7 +670,7 @@ function page2(canInstall, freeSize, osSize, finalSize, license)
         installerWindow.write(math.floor(freeSize))
         installerWindow.setTextColor(installerColors.mainTextColor)
         installerWindow.write(' KB(s)')
-        
+
         linePosY = linePosY + 1
         installerWindow.setCursorPos(2, linePosY)
         installerWindow.setTextColor(installerColors.mainTextColor)
@@ -709,7 +711,7 @@ function page2(canInstall, freeSize, osSize, finalSize, license)
         end
 
 
-    else 
+    else
         installerWindow.setTextColor(installerColors.closeButton)
         linePosY = centerText('Oh No!', installerSize.width, linePosY)
         linePosY = centerText('Espaço insuficiente!', installerSize.width, linePosY)
@@ -718,8 +720,7 @@ function page2(canInstall, freeSize, osSize, finalSize, license)
         generateButton(installerWindow, installerSize.width - 4, installerSize.height - 1, 4, 1, installerColors.closeButton, installerColors.mainTextColor, 'Sair')
         closeInstaller()
     end
-    
-    
+
     if (canInstall) then
         local function nextButton()
             generateButton(installerWindow, installerSize.width - 8, installerSize.height - 1, 8, 1, installerColors.greenText, installerColors.mainTextColor, 'Instalar')
@@ -742,7 +743,7 @@ end
 
 function page1()
     drawnMenu(installerWindow)
-    
+
     installerWindow.setBackgroundColor(installerColors.background)
     installerWindow.setTextColor(installerColors.mainTextColor)
 
@@ -762,7 +763,7 @@ function page1()
     local freeSize = 0
     local osSize = 0
     local githubjson = nil
-    
+
     local function animator()
         animate = true
         loadingAnimation(installerSize.width, linePosY + 2)
@@ -770,7 +771,7 @@ function page1()
             generateButton(installerWindow, (installerSize.width / 2) - 5, linePosY + 2, 11, 3, installerColors.greenText, installerColors.mainTextColor, 'Continuar')
         end
     end
-    
+
     local function getData()
         githubjson, httpErrorMessage, pageErrorContent = http.get(githubApiUrl)
         if (githubjson == nil) then
@@ -788,7 +789,7 @@ function page1()
             pageError('0x01a', 'GitHubUnknow')
             return
         end
-        
+
         parsedResult = json.decode(githubjson.readAll())
 
         freeSize = fs.getFreeSpace("/") / 1024
