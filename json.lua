@@ -1,3 +1,6 @@
+-- JSON v2 by: ElvishJerricco
+-- http://www.computercraft.info/forums2/index.php?/topic/5854-json-api-v201-for-computercraft/
+-- https://pastebin.com/4nRg9CHU
 local controls = {["\n"]="\\n", ["\r"]="\\r", ["\t"]="\\t", ["\b"]="\\b", ["\f"]="\\f", ["\""]="\\\"", ["\\"]="\\\\"}
  
 local function isArray(t)
