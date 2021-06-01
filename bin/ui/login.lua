@@ -8,11 +8,6 @@ local password = textbox.new(2, 4, w - 2, "\7", "Senha")
 
 local logins = file.readTable("/etc/accounts.cfg")
 
-if (logins == nil) then
-    wm.endProcess(id)
-   shell.run('/bin/ui/register.lua')
-end
-
 local usrRaw = ""
 local pswrdRaw = ""
 local errorText = ""

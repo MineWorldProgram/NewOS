@@ -484,23 +484,40 @@ local function main()
     ins.window = serviceWindow
     return lastProcID
   end
+  local logins = file.readTable("/etc/accounts.cfg")
+  local loginID = 1
+  if (logins == nil) then
+    local registerID = wm.createProcess("/bin/ui/register.lua", {
+      showTitlebar = true,
+      dontShowInTitlebar = true,
+      disableControls = true,
+      resizable = false,
+      title = "Registro",
+      width = 35,
+      height = 9,
+      y =  (h / 2) - 4,
+      x =  (w / 2) - 16
+    })
 
-  local loginID = wm.createProcess("/bin/ui/login.lua", {
-    showTitlebar = true,
-    dontShowInTitlebar = true,
-    disableControls = true,
-    resizable = false,
-    title = "Login",
-    height = 7,
-    y =  (h / 2) - 4
-  })
+    wm.selectProcess(registerID)
+  else
+    loginID = wm.createProcess("/bin/ui/login.lua", {
+      showTitlebar = true,
+      dontShowInTitlebar = true,
+      disableControls = true,
+      resizable = false,
+      title = "Login",
+      height = 7,
+      y =  (h / 2) - 4
+    })
 
-  wm.selectProcess(loginID)
-
-  wm.createService(function()
-    sleep(5)
-    os.reboot()
-  end)
+    wm.selectProcess(loginID)
+  
+    wm.createService(function()
+      sleep(5)
+      os.reboot()
+    end)
+  end
 
   drawProcesses()
 

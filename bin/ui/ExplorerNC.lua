@@ -27,8 +27,8 @@ ScrollMainBoxAllowed = false
 ScrollSideBarAllowed = false
 FilesToWork = {} --SIDEBAR --SCROLL SYSTEM
 MainFilesToWork = {} --MainBox --SCROLL SYSTEM
-DefaultDir = "/" --the folder you will seen when you open the explorer
-FirstFolder = "/" -- the folder you cannot get out
+DefaultDir = "/home/" --the folder you will seen when you open the explorer
+FirstFolder = "/home/" -- the folder you cannot get out
 CurrentDir = DefaultDir --Defines the initial folder to the defaltDir
 DiskName = "C:" --Name of diskPartition --OBS: just used on TopBar Define it to "" if you dont want a Disk Partition Name
 UndeletableFolders = {"rom"}
@@ -36,12 +36,12 @@ UndeletableFolders = {"rom"}
 function RefreshPosition()
     ScrollMainBoxAllowed = false
     ScreenSizeX, ScreenSizeY = term.getSize()
-    ScreenSizeX=ScreenSizeX - 6
-    ScreenSizeY=ScreenSizeY - 4
-    SizeX = ScreenSizeX
+    ScreenSizeX=ScreenSizeX
+    ScreenSizeY=ScreenSizeY
+    SizeX = ScreenSizeX-3
     SizeY = ScreenSizeY
-    PositionX = 3
-    PositionY = 1
+    PositionX = 2
+    PositionY = 0
     SideBarX = (PositionX+(SizeX/6))+3
     SideBarY = (PositionY+SizeY+3)
 end
@@ -265,7 +265,6 @@ function DrawnFiles()
     function DrawningFI(Text, C)
         DrawnFile((SideBarX+1)+(CurrentLineHorizontal-1)*5, PositionY+5+((CurrentLineVertical-1)*7), GetTypeOfFile(Text), C)
         DrawnFilledBox((SideBarX+1)+(CurrentLineHorizontal-1)*5, PositionY+9+((CurrentLineVertical-1)*7), (SideBarX+1)+4+(CurrentLineHorizontal-1)*5, PositionY+11+((CurrentLineVertical-1)*7), Colors.main.background)
-        print(Text)
         Write((SideBarX+1)+(CurrentLineHorizontal-1)*5, PositionY+9+((CurrentLineVertical-1)*7), C, Colors.main.background, string.sub(string.sub(Text, 1, string.len(Text)-string.len(GetTypeOfFile(Text))-1), 1, 4))
         Write((SideBarX+1)+(CurrentLineHorizontal-1)*5, PositionY+10+((CurrentLineVertical-1)*7), C, Colors.main.background, string.sub(string.sub(Text, 1, string.len(Text)-string.len(GetTypeOfFile(Text))-1), 5, 8))
         table.insert(Files, {(SideBarX+1)+(CurrentLineHorizontal-1)*5, PositionY+5+((CurrentLineVertical-1)*7), "F", GetTypeOfFile(Text), string.sub(Text, 1, string.len(Text)-string.len(GetTypeOfFile(Text))-1)})
@@ -712,6 +711,12 @@ function ACTION()
     end
     function Checker()
         while true do
+            SizeXT, SizeYT = term.getSize()
+            if (SizeXOld ~= SizeXT or SizeYT ~= SizeYOld) then
+                SizeXOld = SizeXT
+                SizeYOld = SizeYT
+                Drawn()
+            end
             RefreshPosition()
             if (SideBarSelectedFile ~= "") then
                 if (fs.isDir(SideBarSelectedFile) == true) then
