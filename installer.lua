@@ -46,6 +46,7 @@ installerSize = {
 
 installerFile = 'installer.lua'
 jsonFile = 'json.lua'
+exitProcessFile = 'FailMessage.txt'
 
 -- [ Repository information ] --
 githubUsername = 'MineWorldProgram'
@@ -70,6 +71,7 @@ os.loadAPI(jsonFile)
 
 finalDirectoryCode = 'UT' -- DO NOT TOUCH!!!!!!!!!!!
 directoryStartFolder = githubRepository.."-"..branch.."/" -- DO NOT TOUCH!!!!!!!!!!!
+githubRepoUrl = 'https://github.com/'..githubUsername..'/'..githubRepository
 githubApiUrl = 'https://api.github.com/repos/'..githubUsername..'/'..githubRepository
 versionLink = "https://raw.githubusercontent.com/"..githubUsername.."/"..githubRepository.."/"..branch.."/version"
 zipURL = 'https://github.com/'..githubUsername..'/'..githubRepository..'/archive/refs/heads/'..branch..'.zip'
@@ -299,6 +301,7 @@ function page4()
     linePosY = linePosY + 2
 
     local zipContent = nil
+    local instalationSucessfull = false
 
     -- Download Zip File Process
     local function progressBarAnimation()
@@ -379,6 +382,9 @@ function page4()
         local progressStep = 0
         local progressBarFailedSteps = 0
         local reloadProgressBar = true
+        local failedToDownloadFiles = {}
+        local downloadFiles = {}
+        local files = {}
 
         function progressBarDrawner()
             local running = true
@@ -391,7 +397,7 @@ function page4()
                 local redPixels = math.floor((progressBarSize * progressBarFailedSteps) / progressBarSteps)
                 drawnBox(installerWindow, 3, installerSize.height - 2, pixels - 1, 0, installerColors.progressBarFill)
                 if (redPixels > 0) then
-                    drawnBox(installerWindow, 3, installerSize.height - 2, redPixels - 1, 0, installerColors.progressBarFailedFill)
+                    drawnBox(installerWindow, (progressBarSize - redPixels) + 1, installerSize.height - 2, redPixels + 1, 0, installerColors.progressBarFailedFill)
                 end
                 sleep(0.1)
             end
@@ -413,7 +419,6 @@ function page4()
                 addToSet(filesToIgnoreVerifyer, v)
             end
 
-            local files = {}
             for P = 1, string.len(zipContent) do
                 if (string.sub(zipContent, P, P+string.len(directoryStartFolder)-1) == directoryStartFolder) then
                     for Z = P+string.len(directoryStartFolder)-1, string.len(zipContent) do
@@ -442,9 +447,8 @@ function page4()
                 end
             end
             processText = 'Baixando Arquivos'
-            local failedToDownloadFiles = {}
+            local ifwX, ifwY = installingFileWindow.getSize()
             for i, file in ipairs(onlyFiles) do
-                local ifwX, ifwY = installingFileWindow.getSize()
                 installingFileWindow.setCursorPos(1, ifwY)
                 installingFileWindow.scroll(1)
                 installingFileWindow.setTextColor(installerColors.mainTextColor)
@@ -458,27 +462,169 @@ function page4()
                     installingFileWindow.setCursorPos(1, ifwY)
                     installingFileWindow.setTextColor(installerColors.lightGreenText)
                     installingFileWindow.write(file..' - Sucess!')
+                    table.insert(downloadFiles, file)
                 else
                     table.insert(failedToDownloadFiles, file)
                     progressBarFailedSteps = progressBarFailedSteps + 1
                     installingFileWindow.setCursorPos(1, ifwY)
                     installingFileWindow.setTextColor(installerColors.redText)
-                    installingFileWindow.write(file)
+                    installingFileWindow.write(file..' - Failed!')
                 end
             end
             if (#failedToDownloadFiles > 0) then
-                print('FailedToDownloadFiles')
+                instalationSucessfull = false
+            else
+                instalationSucessfull = true
             end
-            reloadProgressBar = false
-            progressBarDrawner()
+
+            if (instalationSucessfull == true) then
+                installingFileWindow.setCursorPos(1, ifwY)
+                installingFileWindow.scroll(1)
+                installingFileWindow.setTextColor(installerColors.mainTextColor)
+                installingFileWindow.write('Limpando... ('..installerFile..')')
+                fs.delete(installerFile)
+                installingFileWindow.setCursorPos(1, ifwY)
+                installingFileWindow.setTextColor(installerColors.lightGreenText)
+                installingFileWindow.write('Limpado ('..installerFile..') - Sucesso')
+
+                installingFileWindow.setCursorPos(1, ifwY)
+                installingFileWindow.scroll(1)
+                installingFileWindow.setTextColor(installerColors.mainTextColor)
+                installingFileWindow.write('Limpando... ('..jsonFile..')')
+                fs.delete(jsonFile)
+                installingFileWindow.setCursorPos(1, ifwY)
+                installingFileWindow.setTextColor(installerColors.lightGreenText)
+                installingFileWindow.write('Limpado ('..jsonFile..') - Sucesso')
             
+                installingFileWindow.setCursorPos(1, ifwY)
+                installingFileWindow.scroll(1)
+                installingFileWindow.setTextColor(installerColors.mainTextColor)
+                installingFileWindow.write('Terminando...')
+                processText = ''
+                sleep(3)
+                reloadProgressBar = false
+                progressBarDrawner()
+            end
         end
         
         parallel.waitForAny(textAnimation, progressBarDrawner, directoriesCreator)
-        installingFileWindow.setVisible(false)
-        canBeClosed = true
-        installerColors.closeButton = colors.red
-        page5()
+        if (instalationSucessfull == true) then
+            installingFileWindow.setVisible(false)
+            canBeClosed = true
+            installerColors.closeButton = colors.red
+            page5()
+        else
+            installingFileWindow.setVisible(true)
+            local ifwX, ifwY = installingFileWindow.getSize()
+            installingFileWindow.setCursorPos(1, ifwY)
+            installingFileWindow.scroll(1)
+            installingFileWindow.setTextColor(installerColors.redText)
+            installingFileWindow.write('Installation failed!')
+            installingFileWindow.setCursorPos(1, ifwY)
+            installingFileWindow.scroll(1)
+            installingFileWindow.setTextColor(installerColors.redText)
+            installingFileWindow.write('Failed files:')
+            for i,v in ipairs(failedToDownloadFiles) do
+                installingFileWindow.setCursorPos(1, ifwY)
+                installingFileWindow.scroll(1)
+                installingFileWindow.setTextColor(installerColors.redText)
+                installingFileWindow.write('[Fail] '..v)
+                sleep(0.01)
+            end
+
+            installingFileWindow.setCursorPos(1, ifwY)
+            installingFileWindow.scroll(2)
+            installingFileWindow.setTextColor(installerColors.mainTextColor)
+            installingFileWindow.write('Reverting installation...')
+            for i, v in ipairs(downloadFiles) do
+                installingFileWindow.setCursorPos(1, ifwY)
+                installingFileWindow.scroll(1)
+                installingFileWindow.setTextColor(installerColors.progressBarUndefinedSizeBackground)
+                installingFileWindow.write('[Deleted File] '..v)
+                fs.delete(v)
+                sleep(0.1)
+            end
+            for O,E in ipairs(files) do
+                if (string.sub(E, string.len(E), string.len(E)) == "/") then
+                    installingFileWindow.setCursorPos(1, ifwY)
+                    installingFileWindow.scroll(1)
+                    installingFileWindow.setTextColor(installerColors.progressBarUndefinedSizeBackground)
+                    installingFileWindow.write('[Deleted Dir] '..E)
+                    fs.delete(E)
+                    sleep(0.1)
+                end
+            end
+            installingFileWindow.setCursorPos(1, ifwY)
+            installingFileWindow.scroll(1)
+            installingFileWindow.setTextColor(installerColors.greenText)
+            installingFileWindow.write('Installation Reverted')
+
+            installingFileWindow.setCursorPos(1, ifwY)
+            installingFileWindow.scroll(2)
+            installingFileWindow.setTextColor(installerColors.mainTextColor)
+            installingFileWindow.write('Exporting exit message...')
+
+            local exitMessage = fs.open(exitProcessFile, 'w')
+            local function centererText(text, width)
+                local spacesNumber = ((width / 2) - (string.len(text) / 2))
+                local spacesNumberF = math.floor((width / 2) - (string.len(text) / 2))
+
+                local spacesText = ''
+                for i=1, spacesNumber do
+                    spacesText = spacesText..' '
+                end
+                if ( spacesNumber ~= spacesNumberF ) then
+                    return spacesText..text..spacesText..' '
+                else
+                    return spacesText..text..spacesText
+                end
+            end
+            exitMessage.write('###########################################################\n')
+            exitMessage.write('#'..centererText(githubRepository, 57)..'#\n')
+            exitMessage.write('#'..centererText('installation Error', 57)..'#\n')
+            exitMessage.write('#'..centererText('If you think this is a error report it on GitHub', 57)..'#\n')
+            exitMessage.write('#'..centererText(githubRepoUrl, 57)..'#\n')
+            exitMessage.write('###########################################################\n')
+            exitMessage.write('\n')
+            exitMessage.write('Install process:\n')
+            exitMessage.write('------------------------------\n')
+            exitMessage.write('Created directories:\n')
+            for O,E in ipairs(files) do
+                if (string.sub(E, string.len(E), string.len(E)) == "/") then
+                    exitMessage.write('Created directory: '..E..'\n')
+                end
+            end
+            exitMessage.write('------------------------------\n')
+            exitMessage.write('Downloaded files:\n')
+            if (#downloadFiles > 0) then
+                for i,v in ipairs(downloadFiles) do
+                    exitMessage.write('Downloaded file: '..v..' | "'..(githubRAW..v)..'" \n')
+                end
+            else
+                exitMessage.write('No files has been downloaded\n')
+            end
+            exitMessage.write('------------------------------\n')
+            exitMessage.write('Failed to downloaded files:\n')
+            for i,v in ipairs(failedToDownloadFiles) do
+                exitMessage.write('Failed to download file: '..v..' | "'..(githubRAW..v)..'" \n')
+            end
+            exitMessage.write('------------------------------\n')
+            exitMessage.write('End of instalation process.\n')
+            exitMessage.close()
+            installingFileWindow.setCursorPos(1, ifwY)
+            installingFileWindow.scroll(1)
+            installingFileWindow.setTextColor(installerColors.mainTextColor)
+            installingFileWindow.write('Exit message exported to: ')
+
+            installingFileWindow.setCursorPos(1, ifwY)
+            installingFileWindow.scroll(1)
+            installingFileWindow.setTextColor(installerColors.mainTextColor)
+            installingFileWindow.write(exitProcessFile)
+            reloadProgressBar = false
+            progressBarDrawner()
+            sleep(0.5)
+            pageError('0x03a', 'DownFail')
+        end
     end
 
     parallel.waitForAny(progressBarAnimation, downloadZipFile)
